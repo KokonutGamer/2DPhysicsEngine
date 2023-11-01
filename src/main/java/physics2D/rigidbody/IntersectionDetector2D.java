@@ -6,6 +6,7 @@ import physics2D.primitive.AxisAlignedBoundingBox;
 import physics2D.primitive.Box2D;
 import physics2D.primitive.Circle;
 import renderer.Line2D;
+import util.GMath;
 
 public class IntersectionDetector2D {
 
@@ -36,9 +37,19 @@ public class IntersectionDetector2D {
 
 		return point.x <= max.x && min.x <= point.x && point.y <= max.y && min.y <= point.y;
 	}
-	
+
 	public static boolean pointInBox2D(Vector2f point, Box2D box) {
-		return false;
+		// Translate the point into local space
+		Vector2f pointLocalBoxSpace = new Vector2f(point);
+		// IMPORTANT: we rotate the point into local space in the other direction of the
+		// box's direction
+		GMath.rotate(pointLocalBoxSpace, 1.0f * box.getRigidBody().getRotation(), box.getRigidBody().getPosition());
+
+		Vector2f min = box.getMin();
+		Vector2f max = box.getMax();
+
+		return pointLocalBoxSpace.x <= max.x && min.x <= pointLocalBoxSpace.x && pointLocalBoxSpace.y <= max.y
+				&& min.y <= pointLocalBoxSpace.y;
 	}
 
 	// Line vs. Primitive Tests
